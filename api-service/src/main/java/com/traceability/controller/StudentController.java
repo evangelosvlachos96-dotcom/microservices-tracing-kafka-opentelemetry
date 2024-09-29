@@ -8,12 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/api/v1/student")
 @AllArgsConstructor
 public class StudentController {
     private StudentService studentService;
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<StudentDtoPost> createStudent(@RequestBody StudentDtoPost studentDto) {
         try {
             StudentDtoPost studentCreated = studentService.addStudent(studentDto);
