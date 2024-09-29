@@ -1,0 +1,76 @@
+extensions:
+  #Facultatif
+  health_check:
+  pprof:
+    endpoint: :1888
+  zpages:
+    endpoint: :55679
+
+receivers:
+  # Data sources: traces, metrics, logs
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+
+#Possible to process data with processors
+processors:
+  # Data sources: traces, metrics, logs
+  batch:
+
+exporters:
+  influxdb:
+    endpoint: http://influxdb:8086
+    timeout: 500ms
+    org: BL
+    bucket: TRACING
+    token: Qr9DsiGC0w4gAvNjbhI98fRS6JWmKXB_xMk_MKjY54RpACtMy_RKhh7aZnfOl-jzrfhMYxuxJbZEKoZYrnQ3dQ==
+
+    sending_queue:
+      enabled: true
+      num_consumers: 3
+      queue_size: 10
+
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 3s
+      max_elapsed_time: 10s
+
+  # Data sources: metrics
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: test-space
+    send_timestamps: true
+    const_labels:
+      label1: value1
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  # Data sources: traces, metrics, logs
+  logging:
+    loglevel: debug
+
+  # Data sources: traces
+  # Test to store trace in kafka like a database.
+  kafka:
+    protocol_version: 2.0.0
+    brokers: [ "broker:29092" ]
+    topic: "traceOtel"
+
+  # Data sources: traces
+  jaeger:
+    endpoint: jaeger-all-in-one:14250
+    tls:
+      insecure: true
+
+#Pipeline
+service:
+  extensions: [pprof, zpages, health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, jaeger]
+

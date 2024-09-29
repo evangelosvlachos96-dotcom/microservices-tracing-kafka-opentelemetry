@@ -1,0 +1,26 @@
+spring:
+    datasource:
+        url: jdbc:postgresql://localhost:5432/postgres
+        username: postgres
+        password: postgres
+    
+    rabbitmq:
+        host: localhost
+        port: 5672
+        username: guest
+        password: guest
+    
+    jpa:
+        generate-ddl: true
+        hibernate:
+            ddl-auto: create
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
+  
+server:
+    port: 8080
