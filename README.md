@@ -8,7 +8,7 @@ This project demonstrates a distributed microservices architecture with multiple
 1. **Spring Boot API Service (`api-service`)**:
     - Exposes a REST endpoint (`/api/v1/student`) to receive POST HTTP requests.
     - Inserts the data into a relational database (PostgreSQL).
-    - Publishes the data as a message to a Kafka topic (`data-topic`).
+    - Publishes the data as a message to a Kafka topic (`student`).
     - Sends OpenTelemetry spans to a collector.
 
 2. **Spring Boot Kafka Consumer Service (`spring-kafka-consumer`)**:
