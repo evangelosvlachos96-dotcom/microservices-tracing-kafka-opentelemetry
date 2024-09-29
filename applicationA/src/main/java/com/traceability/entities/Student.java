@@ -1,16 +1,17 @@
 package com.traceability.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import jakarta.persistence.Entity;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @Table(name = "students")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

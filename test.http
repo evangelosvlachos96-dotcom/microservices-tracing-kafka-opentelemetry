@@ -1,0 +1,9 @@
+### GET request to example server
+POST http://localhost:8080/student/
+Content-Type: application/json
+
+{
+  "firstname": "Gaspard",
+  "lastname": "Proust"
+}
+
