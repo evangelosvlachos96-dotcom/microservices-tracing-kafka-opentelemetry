@@ -10,7 +10,7 @@ type Config struct {
 // LoadConfig loads configuration values for the application
 func LoadConfig() *Config {
 	return &Config{
-		KafkaBrokers:  "localhost:9092",
+		KafkaBrokers:  "localhost:29092",
 		ConsumerGroup: "go-consumer-group",
 		Topic:         "student",
 	}
