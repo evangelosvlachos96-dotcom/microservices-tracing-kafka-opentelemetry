@@ -50,7 +50,7 @@ This project demonstrates a distributed microservices architecture with multiple
 - **Example Request**:
 
 ```bash
-  curl -X POST http://localhost:8080/api/v1/data \
+  curl -X POST http://localhost:8080/api/v1/student \
     -H "Content-Type: application/json" \
     -d '{"id": 1, "name": "Sample Data"}'
 ```
