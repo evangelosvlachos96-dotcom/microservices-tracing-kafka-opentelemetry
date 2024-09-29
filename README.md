@@ -58,7 +58,7 @@ This project demonstrates a distributed microservices architecture with multiple
 - **Spans Produced**:
     - `HTTP POST /api/v1/student`
     - `Database Insert`
-    - `Kafka Produce to student`
+    - `Kafka Produce to student topic`
 
 ### 2. Spring Boot Kafka Consumer (`spring-app-consumer`)
 
