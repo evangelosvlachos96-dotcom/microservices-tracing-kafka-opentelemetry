@@ -60,10 +60,6 @@
 			<version>1.23.0-alpha</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-autoconfigure</artifactId>
-		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
