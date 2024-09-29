@@ -52,11 +52,11 @@ This project demonstrates a distributed microservices architecture with multiple
 ```bash
   curl -X POST http://localhost:8080/api/v1/student \
     -H "Content-Type: application/json" \
-    -d '{"id": 1, "name": "Sample Data"}'
+    -d '{"firstname": "Gaspard", "lastname": "Proust"}'
 ```
 
 - **Spans Produced**:
-    - `HTTP POST /api/v1/data`
+    - `HTTP POST /api/v1/student`
     - `Database Insert`
     - `Kafka Produce to student`
 
