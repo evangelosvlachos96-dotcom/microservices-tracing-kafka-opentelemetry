@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"applicationC/config"
 	"fmt"
 	"log"
 
@@ -8,11 +9,11 @@ import (
 )
 
 // StartConsumer initializes a Kafka consumer and starts consuming messages
-func StartConsumer() error {
+func StartConsumer(cfg *config.Config) error {
 	// Define Kafka consumer configuration
 	config := &kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9092",
-		"group.id":          "go-consumer-group",
+		"bootstrap.servers": cfg.KafkaBrokers,
+		"group.id":          cfg.ConsumerGroup,
 		"auto.offset.reset": "earliest",
 	}
 

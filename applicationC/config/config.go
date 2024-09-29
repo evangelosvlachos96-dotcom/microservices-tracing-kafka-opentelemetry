@@ -1,4 +1,3 @@
-// config/config.go
 package config
 
 // Config stores the application configuration values
@@ -13,6 +12,6 @@ func LoadConfig() *Config {
 	return &Config{
 		KafkaBrokers:  "localhost:9092",
 		ConsumerGroup: "go-consumer-group",
-		Topic:         "test_topic",
+		Topic:         "student",
 	}
 }
