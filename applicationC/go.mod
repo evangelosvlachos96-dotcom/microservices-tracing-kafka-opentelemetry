@@ -4,7 +4,6 @@ go 1.23.1
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2
-	github.com/jurabek/otelkafka v0.0.0-20240825100514-b0047c336bd0
 	go.opentelemetry.io/otel v1.30.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.28.0
 	go.opentelemetry.io/otel/sdk v1.30.0
