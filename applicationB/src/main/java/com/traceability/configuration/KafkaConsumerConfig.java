@@ -1,7 +1,7 @@
 package com.traceability.configuration;
 
 import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.instrumentation.spring.kafka.v2_7.SpringKafkaTelemetry;
+//import io.opentelemetry.instrumentation.spring.kafka.v2_7.SpringKafkaTelemetry;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class KafkaConsumerConfig {
         Map<String, Object> props = new HashMap<>();
         props.put(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                "localhost:9092");
+                "localhost:29092");
         props.put(
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class);
@@ -45,18 +45,18 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-        factory.setContainerCustomizer(listenerCustomizer());
+//        factory.setContainerCustomizer(listenerCustomizer());
         return factory;
     }
 
-    @Bean
-    public ContainerCustomizer<String, String, ConcurrentMessageListenerContainer<String, String>>
-    listenerCustomizer() {
-        SpringKafkaTelemetry springKafkaTelemetry =
-                SpringKafkaTelemetry.create(openTelemetry);
-        return container -> {
-            container.setRecordInterceptor(springKafkaTelemetry.createRecordInterceptor());
-            container.setBatchInterceptor(springKafkaTelemetry.createBatchInterceptor());
-        };
-    }
+//    @Bean
+//    public ContainerCustomizer<String, String, ConcurrentMessageListenerContainer<String, String>>
+//    listenerCustomizer() {
+//        SpringKafkaTelemetry springKafkaTelemetry =
+//                SpringKafkaTelemetry.create(openTelemetry);
+//        return container -> {
+//            container.setRecordInterceptor(springKafkaTelemetry.createRecordInterceptor());
+//            container.setBatchInterceptor(springKafkaTelemetry.createBatchInterceptor());
+//        };
+//    }
 }

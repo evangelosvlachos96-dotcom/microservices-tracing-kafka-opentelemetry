@@ -4,12 +4,13 @@ spring:
         username: postgres
         password: postgres
     
-    rabbitmq:
-        host: localhost
-        port: 5672
-        username: guest
-        password: guest
-    
+    kafka:
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            bootstrap-servers: localhost:29092
+        bootstrap-servers: localhost:29092
+
     jpa:
         generate-ddl: true
         hibernate:
@@ -21,6 +22,5 @@ spring:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
 
 
-  
 server:
     port: 8080

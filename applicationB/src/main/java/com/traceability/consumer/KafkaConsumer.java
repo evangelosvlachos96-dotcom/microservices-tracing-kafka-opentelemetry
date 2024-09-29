@@ -8,13 +8,11 @@ import org.springframework.stereotype.Component;
 // Class
 public class KafkaConsumer {
 
-    @KafkaListener(topics = "topicStudent",
+    @KafkaListener(topics = "student",
             groupId = "group_id")
 
     // Method
-    public void
-    consume(String message)
-    {
+    public void consume(String message) {
         // Print statement
         System.out.println("message = " + message);
     }
