@@ -4,8 +4,12 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogRecordExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.logs.SdkLoggerProvider;
+import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor;
+import io.opentelemetry.sdk.logs.export.LogRecordExporter;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
@@ -23,6 +27,19 @@ public class OtelConfig {
 
         return OpenTelemetrySdk.builder()
                 .setTracerProvider(sdkTracerProvider())
+                .setLoggerProvider(
+                        SdkLoggerProvider.builder()
+                                .setResource(
+                                        Resource.getDefault().toBuilder()
+                                                .put(ResourceAttributes.SERVICE_NAME, "log4j-example")
+                                                .build())
+                                .addLogRecordProcessor(
+                                        BatchLogRecordProcessor.builder(
+                                                        OtlpGrpcLogRecordExporter.builder()
+                                                                .setEndpoint("http://127.0.0.1:4317")
+                                                                .build())
+                                                .build())
+                                .build())
                 .setPropagators(ContextPropagators.create(W3CTraceContextPropagator.getInstance()))
                 .buildAndRegisterGlobal();
     }

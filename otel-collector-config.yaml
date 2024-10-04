@@ -13,30 +13,19 @@ receivers:
       grpc:
         endpoint: 0.0.0.0:4317
       http:
+        endpoint: 0.0.0.0:4318
 
 #Possible to process data with processors
 processors:
-  # Data sources: traces, metrics, logs
   batch:
+    send_batch_size: 10000
+    timeout: 10s
 
 exporters:
-  influxdb:
-    endpoint: http://influxdb:8086
-    timeout: 500ms
-    org: BL
-    bucket: TRACING
-    token: Qr9DsiGC0w4gAvNjbhI98fRS6JWmKXB_xMk_MKjY54RpACtMy_RKhh7aZnfOl-jzrfhMYxuxJbZEKoZYrnQ3dQ==
-
-    sending_queue:
-      enabled: true
-      num_consumers: 3
-      queue_size: 10
-
-    retry_on_failure:
-      enabled: true
-      initial_interval: 1s
-      max_interval: 3s
-      max_elapsed_time: 10s
+  otlp/uptrace:
+    endpoint: http://uptrace:14317
+    tls: { insecure: true }
+    headers: { 'uptrace-dsn': 'http://project1_secret_token@localhost:14318?grpc=14317' }
 
   # Data sources: metrics
   prometheus:
@@ -52,25 +41,15 @@ exporters:
   logging:
     loglevel: debug
 
-  # Data sources: traces
-  # Test to store trace in kafka like a database.
-  kafka:
-    protocol_version: 2.0.0
-    brokers: [ "broker:29092" ]
-    topic: "traceOtel"
-
-  # Data sources: traces
-  jaeger:
-    endpoint: jaeger-all-in-one:14250
-    tls:
-      insecure: true
-
 #Pipeline
 service:
   extensions: [pprof, zpages, health_check]
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [logging, jaeger]
-
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ otlp/uptrace ]
+    logs:
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ otlp/uptrace ]
