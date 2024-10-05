@@ -134,4 +134,5 @@ docker-compose up -d
 ![uptracelog.png](img/uptrace-span.png)
 
 ![uptrace-error.png](img/uptrace-error-log.png)
+
 ![uptracespan.png](img/uptrace-error-trace.png)
