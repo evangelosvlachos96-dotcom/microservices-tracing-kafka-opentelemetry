@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  db:
+  postgres:
     container_name: postgres
     hostname: postgres
     image: postgres:latest
@@ -16,7 +16,7 @@ services:
       - postgres:/data/postgres
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.7.1
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -24,7 +24,7 @@ services:
       - 22181:2181
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.7.1
     depends_on:
       - zookeeper
     ports:
@@ -38,7 +38,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   kafka-ui:
-    image: provectuslabs/kafka-ui:latest
+    image: provectuslabs/kafka-ui:v0.7.2
     depends_on:
       - kafka
     ports:
@@ -50,34 +50,54 @@ services:
 
   # Collector
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    image: otel/opentelemetry-collector-contrib:0.111.0
     command: [ "--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}" ]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
     ports:
-      - "1888:1888"   # pprof extension
+      - "1889:1888"   # pprof extension
       # - "8888:8888"   # Prometheus metrics exposed by the collector
       # - "8889:8889"   # Prometheus exporter metrics
       - "13133:13133" # health_check extension
       - "4317:4317"   # OTLP gRPC receiver
       - "4318:4318"   # OTLP HTTP receiver
       - "55679:55679" # zpages extension
-    depends_on:
-      - jaeger-all-in-one
     networks:
       - traceability
 
-  # Jaeger
-  jaeger-all-in-one:
-    container_name: jaeger-all-in-one
-    image: jaegertracing/all-in-one:latest
+
+  # Uptrace
+  uptrace:
+    image: uptrace/uptrace:1.7.7
+    restart: on-failure
+    volumes:
+      - ./uptrace.yml:/etc/uptrace/uptrace.yml
     ports:
-      - "16686:16686"
-      - "14268"
-      - "14250"
+      - '14317:14317'
+      - '14318:14318'
+    depends_on:
+      - clickhouse
+      - postgres
     networks:
       - traceability
 
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.7
+    restart: on-failure
+    environment:
+      CLICKHOUSE_DB: uptrace
+    healthcheck:
+      test: [ 'CMD', 'wget', '--spider', '-q', 'localhost:8123/ping' ]
+      interval: 1s
+      timeout: 1s
+      retries: 30
+    volumes:
+      - ch_data2:/var/lib/clickhouse
+    ports:
+      - '8123:8123'
+      - '9000:9000'
+    networks:
+      - traceability
 
 networks:
   traceability:
@@ -86,3 +106,4 @@ networks:
 volumes:
   postgres:
   pgadmin:
+  ch_data2:

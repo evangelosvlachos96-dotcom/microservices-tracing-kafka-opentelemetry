@@ -1,14 +1,24 @@
 package com.traceability.consumer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.traceability.service.StudentBillingService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 public class KafkaConsumer {
 
+    private final StudentBillingService studentBillingService;
+
+    public KafkaConsumer(StudentBillingService studentBillingService) {
+        this.studentBillingService = studentBillingService;
+    }
+
     @KafkaListener(topics = "student", groupId = "group_id")
-    public void consume(String message) {
-        System.out.println("message = " + message);
+    public void consume(String message) throws JsonProcessingException {
+        studentBillingService.billStudent(message);
     }
 }
 

@@ -1,9 +1,7 @@
 package com.traceability.entities;
 
-import jakarta.persistence.Entity;
-import lombok.*;
-
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -11,7 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
-@Table(name = "students", uniqueConstraints = {@UniqueConstraint(columnNames = {"firstname", "lastname"})})
+@Table(name = "students")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Student implements Serializable {

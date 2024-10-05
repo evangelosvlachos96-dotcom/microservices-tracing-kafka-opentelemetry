@@ -23,9 +23,11 @@ This project demonstrates a distributed microservices architecture with multiple
     - Sends OpenTelemetry spans to a collector.
 
 ### Observability Stack:
-- **Jaeger**:
-    - Collects and visualizes the distributed tracing information from all microservices.
-    - Shows the complete trace for every incoming HTTP request, including database operations and Kafka message processing.
+- **Uptrace**:
+    - A distributed tracing and performance monitoring tool built on top of OpenTelemetry.
+    - Collects and visualizes distributed tracing information from all microservices, allowing for monitoring of application performance and system dependencies.
+    - Displays complete traces for every incoming HTTP request, including database operations, message queues like Kafka, and other services involved in the request flow.
+    - Offers rich insights into latency, error rates, and request performance, helping to diagnose and resolve issues more efficiently.
 
 ### Architecture Diagram:
 

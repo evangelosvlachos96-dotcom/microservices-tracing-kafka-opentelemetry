@@ -12,6 +12,6 @@ func LoadConfig() *Config {
 	return &Config{
 		KafkaBrokers:  "localhost:29092",
 		ConsumerGroup: "go-consumer-group",
-		Topic:         "student",
+		Topic:         "student-billing",
 	}
 }

@@ -73,8 +73,6 @@
 			<version>1.23.0-alpha</version>
 			<scope>compile</scope>
 		</dependency>
-
-
 	</dependencies>
 
 	<dependencyManagement>
@@ -83,6 +81,13 @@
 				<groupId>io.opentelemetry.instrumentation</groupId>
 				<artifactId>opentelemetry-instrumentation-bom</artifactId>
 				<version>2.6.0</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-bom</artifactId>
+				<version>2.24.1</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
