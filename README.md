@@ -59,27 +59,6 @@ docker-compose up -d
 ## Architecture Overview
 ![microservice.png](img/microservice.png)
 
-
-### Components:
-1. **Spring Boot API Service (`api-service`)**:
-    - Exposes a REST endpoint (`/api/v1/student`) to receive POST HTTP requests.
-    - Inserts the data into a relational database (PostgreSQL).
-    - Publishes the data as a message to a Kafka topic (`student`).
-    - Sends OpenTelemetry spans to a collector.
-
-2. **Spring Boot Kafka Consumer Service (`spring-kafka-consumer`)**:
-    - Listens to the `student` Kafka topic.
-    - Consumes the messages published by the `api-service`.
-    - Update the student table with student fees appropriate.
-    - Publishes the student entity with fees as a message to a Kafka topic (`student-billing`).
-    - Processes the messages and sends OpenTelemetry spans to a collector.
-
-3. **Go Kafka Consumer Service (`go-consumer`)**:
-    - Listens to the `student-billing` Kafka topic.
-    - Consumes the same messages published by the `api-service`.
-    - Prints the message and logs its trace details.
-    - Sends OpenTelemetry spans to a collector.
-
 ### Observability Stack:
 ![uptrace.png](img/Uptrace.png)
 
@@ -125,7 +104,9 @@ docker-compose up -d
 - **Functionality**:
     - Listens to the Kafka topic `student`.
     - Consumes messages and processes the data.
-    - Prints the received message and processes it.
+    - Update the student table with student fees appropriate.
+    - Publishes the student entity with fees as a message to a Kafka topic (`student-billing`).
+    - Processes the messages and sends OpenTelemetry spans to a collector.
 
 - **OpenTelemetry Integration**:
     - Traces the message consumption.
@@ -139,8 +120,8 @@ docker-compose up -d
 ### 3. Go Kafka Consumer (`go-consumer`)
 
 - **Functionality**:
-    - Listens to the Kafka topic `student`.
-    - Consumes the messages published by the `api-service`.
+    - Listens to the Kafka topic `student-billing`.
+    - Consumes the messages published by the `spring-app-consumer`.
     - Logs the received message details.
 
 - **OpenTelemetry Integration**:
@@ -148,5 +129,4 @@ docker-compose up -d
     - Links the span with the original trace using Kafka message headers.
 
 - **Spans Produced**:
-    - `Kafka Consume from student`
-    - `Log Message Details`
+    - `Kafka Consume from student-billing`
