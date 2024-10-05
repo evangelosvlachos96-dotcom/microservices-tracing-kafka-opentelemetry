@@ -24,6 +24,38 @@ In this project, there are two types of instrumentation: **auto-instrumentation 
 - **Example in this project**:
     - The **Go Kafka Consumer Service** (`go-kafka-consumer`) uses **manual instrumentation** to trace Kafka message consumption. Each message is manually traced, and spans are linked to the original trace using Kafka headers.
 
+
+## Running the Project
+
+To get started with this project, you can easily set up and run the services using Docker Compose. Follow the steps below:
+
+### 1. Start the Services
+
+Make sure you have Docker and Docker Compose installed on your machine. Then, navigate to the project directory and run the following command to start all services in detached mode:
+
+```bash
+docker-compose up -d
+```
+```bash
+  curl -X POST http://localhost:8080/api/v1/student \
+    -H "Content-Type: application/json" \
+    -d '{"firstname": "Gaspard", "lastname": "Proust"}'
+```
+
+### Kafka UI
+
+- **Service Name**: `kafka-ui`
+- **Access URL**: [http://localhost:8090](http://localhost:8090)
+- **Description**: Kafka UI is a web-based interface for managing and monitoring Apache Kafka clusters, allowing users to view topics, consumer groups, and messages easily.
+
+---
+
+### Uptrace
+
+- **Service Name**: `uptrace`
+- **Access URL**: [http://localhost:14318](http://localhost:14318)
+- **Description**: Uptrace is a distributed tracing and performance monitoring tool that provides insights into the performance and behavior of microservices, enabling effective monitoring and troubleshooting.
+
 ## Architecture Overview
 ![microservice.png](img/microservice.png)
 
