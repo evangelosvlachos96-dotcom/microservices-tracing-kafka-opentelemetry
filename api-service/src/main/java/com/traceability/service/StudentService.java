@@ -19,15 +19,15 @@ public class StudentService {
     private StudentRepository studentRepository;
     private ModelMapper modelMapper;
 
-    private KafkaTemplate<String, StudentDtoPost> kafkaTemplate;
+    private KafkaTemplate<String, Student> kafkaTemplate;
 
     public StudentDtoPost addStudent(StudentDtoPost studentDto){
         modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.LOOSE);
         Student student = modelMapper.map(studentDto, Student.class);
         studentRepository.save(student);
-        kafkaTemplate.send(TOPIC_NAME, studentDto);
-        log.info("Student added");
+        kafkaTemplate.send(TOPIC_NAME, student);
+        log.info("student correctly registered {}", studentDto);
         return studentDto;
     }
 }

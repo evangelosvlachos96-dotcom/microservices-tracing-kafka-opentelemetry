@@ -1,9 +1,7 @@
 package com.traceability.entities;
 
-import jakarta.persistence.Entity;
-import lombok.*;
-
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -20,4 +18,5 @@ public class Student implements Serializable {
     Integer idStudent;
     String firstname;
     String lastname;
+    Double fees;
 }
