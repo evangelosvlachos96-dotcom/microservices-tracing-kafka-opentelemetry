@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
-@Table(name = "students")
+@Table(name = "students", uniqueConstraints = {@UniqueConstraint(columnNames = {"firstname", "lastname"})})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Student implements Serializable {
@@ -20,4 +20,5 @@ public class Student implements Serializable {
     Integer idStudent;
     String firstname;
     String lastname;
+    Double fees;
 }

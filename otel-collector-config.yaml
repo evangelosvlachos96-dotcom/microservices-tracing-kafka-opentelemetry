@@ -17,6 +17,8 @@ receivers:
 
 #Possible to process data with processors
 processors:
+  resourcedetection:
+    detectors: [ env, system ]
   batch:
     send_batch_size: 10000
     timeout: 10s
@@ -26,20 +28,6 @@ exporters:
     endpoint: http://uptrace:14317
     tls: { insecure: true }
     headers: { 'uptrace-dsn': 'http://project1_secret_token@localhost:14318?grpc=14317' }
-
-  # Data sources: metrics
-  prometheus:
-    endpoint: "0.0.0.0:8889"
-    namespace: test-space
-    send_timestamps: true
-    const_labels:
-      label1: value1
-    resource_to_telemetry_conversion:
-      enabled: true
-
-  # Data sources: traces, metrics, logs
-  logging:
-    loglevel: debug
 
 #Pipeline
 service:
@@ -52,4 +40,8 @@ service:
     logs:
       receivers: [ otlp ]
       processors: [ batch ]
+      exporters: [ otlp/uptrace ]
+    metrics:
+      receivers: [ otlp ]
+      processors: [ batch, resourcedetection ]
       exporters: [ otlp/uptrace ]
