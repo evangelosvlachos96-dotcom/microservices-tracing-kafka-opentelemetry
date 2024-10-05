@@ -27,6 +27,7 @@ In this project, there are two types of instrumentation: **auto-instrumentation 
 ## Architecture Overview
 ![microservice.png](img/microservice.png)
 
+
 ### Components:
 1. **Spring Boot API Service (`api-service`)**:
     - Exposes a REST endpoint (`/api/v1/student`) to receive POST HTTP requests.
