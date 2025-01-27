@@ -108,6 +108,7 @@ func processMessage(ctx context.Context, msg *kafka.Message) {
 		attribute.String("messaging.destination", *msg.TopicPartition.Topic),
 		attribute.Int64("messaging.kafka.partition", int64(msg.TopicPartition.Partition)),
 		attribute.String("messaging.kafka.message_key", string(msg.Key)),
+		attribute.String("application.language", "Go"),
 	)
 
 	// Log message details

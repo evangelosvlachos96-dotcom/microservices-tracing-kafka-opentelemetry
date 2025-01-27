@@ -1,0 +1,42 @@
+version: '3'
+
+tasks:
+  build-java-service-1:
+    desc: "Build the Java project and generate the .jar file"
+    dir: ./api-service
+    cmds:
+      - echo "Building the Java projects..."
+      - mvn clean compile package
+      - echo "Build complete. Generated .jar file in 'target/' directory."
+
+  build-java-service-2:
+    desc: "Build the Java project and generate the .jar file"
+    dir: ./spring-app-consumer
+    cmds:
+      - echo "Building the Java projects..."
+      - mvn clean compile package
+      - echo "Build complete. Generated .jar file in 'target/' directory."
+
+  start-service-1:
+    desc: "Start the java API service"
+    deps: [build-java-service-1]
+    dir: ./api-service
+    cmds:
+      - echo "Starting the java API service..."
+      - java -Xms512m -Xmx1024m -jar target/service1-0.0.1.jar
+
+  start-service-2:
+    desc: "Start the java consumer service"
+    deps: [build-java-service-2]
+    dir: ./spring-app-consumer
+    cmds:
+      - echo "Starting the java consumer service..."
+      - java -Xms512m -Xmx1024m -jar target/service2-0.0.1.jar
+
+  start-service-3:
+    desc: "Start the Go consumer service"
+    dir: ./go-consumer
+    cmds:
+      - echo "Starting the Go consumer service..."
+      - go run cmd/consumer/main.go
+
