@@ -2,7 +2,7 @@
 
 This project demonstrates a distributed microservices architecture with multiple components working together to handle 
 HTTP requests, database interactions, and messaging using Kafka. 
-OpenTelemetry is used for end-to-end tracing, allowing the complete flow of requests to be visualized in Jaeger.
+OpenTelemetry is used for end-to-end tracing, allowing the complete flow of requests to be visualized in Uptrace.
 
 In this project, there are two types of instrumentation: **auto-instrumentation with library** and **manual instrumentation**.
 
