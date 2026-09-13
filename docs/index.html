@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microservices Tracing — Kafka + OpenTelemetry, end to end</title>
+<meta name="description" content="Three services — two Spring Boot, one Go — pass a request through PostgreSQL and two Kafka topics. OpenTelemetry stitches every hop into one trace you can read in Uptrace. Auto-instrumentation on the Java side, manual spans on the Go side.">
+<meta property="og:title" content="Microservices Tracing — Kafka + OpenTelemetry">
+<meta property="og:description" content="One HTTP request, two Kafka hops, three services, a single trace in Uptrace. Auto vs. manual OpenTelemetry instrumentation side by side.">
+<meta property="og:image" content="https://evangelosvlachos96-dotcom.github.io/microservices-tracing-kafka-opentelemetry/img/archi-macro.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --board:#e9edf1; --paper:#fff; --ink:#1b2733; --muted:#5d6c7b; --rule:#cfd6dd;
+    --accent:#b0392d;
+  }
+  * { box-sizing:border-box }
+  body { margin:0; font-family:"Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--board); line-height:1.5 }
+  a { color:var(--accent) }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 1.5rem }
+  header { background:var(--paper); border-bottom:1px solid var(--rule); border-top:4px solid var(--accent) }
+  header .wrap { display:flex; justify-content:space-between; align-items:center; padding:1rem 1.5rem }
+  header b { font-size:1.05rem }
+  nav a { margin-left:1.25rem; color:var(--muted); text-decoration:none; font-size:.95rem }
+  nav a:hover { color:var(--ink) }
+  .hero { padding:3.5rem 0 2.5rem }
+  .hero h1 { font-size:clamp(2rem,4.5vw,3rem); line-height:1.1; margin:0 0 1rem; letter-spacing:-.01em; max-width:14ch }
+  .hero p { font-size:1.15rem; color:var(--muted); max-width:52ch; margin:0 0 1.75rem }
+  .cta { display:inline-flex; gap:.75rem; flex-wrap:wrap }
+  .btn { display:inline-block; padding:.7rem 1.25rem; border-radius:6px; text-decoration:none; font-weight:500; border:1px solid var(--rule); background:var(--paper); color:var(--ink) }
+  .btn--primary { background:var(--accent); color:#fff; border-color:var(--accent) }
+  .btn:hover { border-color:var(--accent) }
+  .shot { background:var(--paper); border:1px solid var(--rule); border-radius:10px; overflow:hidden; box-shadow:0 12px 40px rgba(27,39,51,.12) }
+  .shot img { display:block; width:100% }
+  section { padding:3rem 0 }
+  section h2 { font-size:1.6rem; margin:0 0 .5rem }
+  section > .wrap > p.lead { color:var(--muted); max-width:60ch; margin:0 0 2rem }
+  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.25rem }
+  .step { background:var(--paper); border:1px solid var(--rule); border-radius:8px; padding:1.25rem }
+  .step b { display:block; font-size:1.05rem; margin-bottom:.35rem }
+  .step p { margin:0; color:var(--muted) }
+  .step code { background:var(--board); padding:.1em .35em; border-radius:3px; font-size:.9em }
+  .feature { display:grid; grid-template-columns:1fr 1.4fr; gap:2rem; align-items:center; margin-bottom:3rem }
+  .feature:nth-child(even) { grid-template-columns:1.4fr 1fr }
+  .feature:nth-child(even) .text { order:2 }
+  .feature h3 { margin:0 0 .5rem; font-size:1.25rem }
+  .feature p { margin:0; color:var(--muted) }
+  .feature code { background:var(--paper); border:1px solid var(--rule); padding:.1em .35em; border-radius:3px; font-size:.9em }
+  .legend { list-style:none; padding:0; margin:1rem 0 0; display:grid; gap:.4rem }
+  .legend li { padding-left:1rem; border-left:5px solid var(--accent) }
+  .rules { background:var(--paper); border:1px solid var(--rule); border-radius:8px; padding:1.5rem 1.75rem }
+  .rules ol { margin:.5rem 0 0; padding-left:1.25rem }
+  .rules li { margin:.35rem 0 }
+  .rules code { background:var(--board); padding:.1em .35em; border-radius:3px; font-size:.9em }
+  .rules .note { margin-top:1rem; padding-top:1rem; border-top:1px solid var(--rule); color:var(--muted) }
+  pre { background:var(--ink); color:#dfe7ee; padding:1rem 1.25rem; border-radius:8px; overflow:auto; font-size:.9rem }
+  footer { border-top:1px solid var(--rule); padding:2rem 0; color:var(--muted); font-size:.9rem }
+  @media (max-width:760px) { .feature, .feature:nth-child(even) { grid-template-columns:1fr } .feature:nth-child(even) .text { order:0 } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <b>Microservices Tracing</b>
+    <nav>
+      <a href="#start">Start</a>
+      <a href="#how">How it works</a>
+      <a href="#flow">The flow</a>
+      <a href="https://github.com/evangelosvlachos96-dotcom/microservices-tracing-kafka-opentelemetry">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>One request, two Kafka hops, three services — one trace.</h1>
+    <p>A small distributed system built to show OpenTelemetry tracing across HTTP, PostgreSQL and Kafka. Two Spring Boot services use auto-instrumentation; a Go consumer creates its spans by hand. Every hop lands in the same trace in Uptrace. Runs locally with Docker Compose.</p>
+    <div class="cta">
+      <a class="btn btn--primary" href="https://github.com/evangelosvlachos96-dotcom/microservices-tracing-kafka-opentelemetry">View on GitHub</a>
+      <a class="btn" href="https://github.com/evangelosvlachos96-dotcom/microservices-tracing-kafka-opentelemetry#readme">Read the README</a>
+    </div>
+  </div>
+  <div class="wrap" style="margin-top:2.5rem">
+    <div class="shot"><img src="img/archi-macro.png" alt="Architecture diagram: an HTTP request enters the Spring Boot API service, which writes to PostgreSQL and publishes to Kafka; a Spring Boot consumer and a Go consumer read from Kafka; all three export traces to the OpenTelemetry collector and on to Uptrace"></div>
+  </div>
+</div>
+
+<section id="start">
+  <div class="wrap">
+    <h2>Start in three steps</h2>
+    <p class="lead">You need Docker, Java 23 with Maven, and Go. Taskfile is optional but saves typing.</p>
+    <div class="steps">
+      <div class="step"><b>1 · Bring up the infrastructure</b><p><code>docker-compose up -d</code> starts PostgreSQL, Zookeeper, Kafka, Kafka UI, the OpenTelemetry collector, ClickHouse and Uptrace.</p></div>
+      <div class="step"><b>2 · Run the three services</b><p>One terminal each: <code>task start-service-1</code>, <code>task start-service-2</code>, <code>task start-service-3</code>. Without Taskfile: <code>mvn clean compile package</code> then <code>java -jar</code> for the two Spring apps, and <code>go run cmd/consumer/main.go</code> for the Go one.</p></div>
+      <div class="step"><b>3 · Send a request, open Uptrace</b><p>POST a student to <code>localhost:8080/api/v1/student</code> with curl or the bundled <code>test.http</code>. Then open Uptrace at <code>localhost:14318</code> and Kafka UI at <code>localhost:8090</code>.</p></div>
+    </div>
+    <pre>curl -X POST http://localhost:8080/api/v1/student \
+  -H "Content-Type: application/json" \
+  -d '{"firstname": "Gaspard", "lastname": "Proust"}'</pre>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="lead">Two ways of getting spans out of a service, side by side in one system.</p>
+
+    <div class="feature">
+      <div class="text">
+        <h3>Auto-instrumentation on the Java side</h3>
+        <p>The API service and the Spring Kafka consumer pull in <code>opentelemetry-spring-boot-starter</code>. HTTP handling, JPA calls to PostgreSQL and Kafka produce/consume get spans without touching the business code. The trace context rides along in Kafka message headers.</p>
+      </div>
+      <div class="shot"><img src="img/uptrace.png" alt="Uptrace overview screen listing the services and their traced operations"></div>
+    </div>
+
+    <div class="feature">
+      <div class="text">
+        <h3>Manual spans on the Go side</h3>
+        <p>The Go consumer uses the OpenTelemetry SDK directly with <code>confluent-kafka-go</code>. For every message it reads the trace context from the headers, opens its own span, and exports it over OTLP gRPC — so the Go hop shows up as a child of the same trace the Java services started.</p>
+      </div>
+      <div class="shot"><img src="img/uptrace-span.png" alt="A single trace in Uptrace showing spans from the HTTP request through the database insert, Kafka produce, and the consumer services"></div>
+    </div>
+
+    <div class="feature">
+      <div class="text">
+        <h3>Errors stay attached to the request</h3>
+        <p>When something fails downstream, the error log and the failing span are part of the same trace as the original HTTP call, so you can walk from the 500 back to the line that raised it.</p>
+      </div>
+      <div class="shot"><img src="img/uptrace-error-log.png" alt="Uptrace log view showing an error entry with its trace id and attributes"></div>
+    </div>
+
+    <div class="feature">
+      <div class="text">
+        <h3>The whole waterfall in Uptrace</h3>
+        <p>Uptrace sits on ClickHouse and receives everything through the OpenTelemetry collector on ports 4317/4318. Latency, error rate and span details per service, one screen.</p>
+      </div>
+      <div class="shot"><img src="img/uptrace-error-trace.png" alt="Uptrace trace waterfall with a red error span highlighted among the request's spans"></div>
+    </div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="wrap">
+    <h2>The flow, hop by hop</h2>
+    <p class="lead">What each service does and the spans it produces.</p>
+    <div class="rules">
+      <ol>
+        <li><b>api-service</b> (Spring Boot) — receives <code>POST /api/v1/student</code>, inserts the row into PostgreSQL, publishes the same data to the <code>student</code> topic. Spans: <em>HTTP POST</em>, <em>Database Insert</em>, <em>Kafka Produce</em>.</li>
+        <li><b>spring-app-consumer</b> (Spring Boot) — consumes from <code>student</code>, updates the row with the student's fees, publishes the enriched entity to <code>student-billing</code>. Spans: <em>Kafka Consume</em>, <em>Message Processing</em>, linked to the original trace via headers.</li>
+        <li><b>go-consumer</b> (Go) — consumes from <code>student-billing</code> and logs the message. Span: <em>Kafka Consume</em>, manually created and linked to the same trace.</li>
+      </ol>
+      <p class="note">Infrastructure from <code>docker-compose.yml</code>: PostgreSQL, Confluent Kafka 7.7.1 + Zookeeper, Kafka UI, OpenTelemetry Collector 0.111, Uptrace 1.7.7, ClickHouse 24.7.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Java 23 · Spring Boot 3.3 · Go 1.23 · Kafka · PostgreSQL · OpenTelemetry · Uptrace · Docker Compose &nbsp;·&nbsp;
+    <a href="https://github.com/evangelosvlachos96-dotcom/microservices-tracing-kafka-opentelemetry">Source on GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>
